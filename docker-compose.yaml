@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+
+  db:
+    image: postgres:14.6-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - diploma_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+      interval: 3s
+      timeout: 3s
+      retries: 15
+
+
+volumes:
+  diploma_postgres_data:
+
+
+
