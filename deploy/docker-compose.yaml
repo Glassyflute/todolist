@@ -28,8 +28,6 @@ services:
     depends_on:
       api:
         condition: service_started
-      collect_static:
-        condition: service_completed_successfully
     restart: always
 
 
@@ -39,8 +37,8 @@ services:
     entrypoint: ''
     volumes:
       - django_static:/opt/static/
-#      - ./core:/opt/core
     command: python3 manage.py collectstatic -c --no-input
+
 
   api:
     image: azulien/todolist:latest
