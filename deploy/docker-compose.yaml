@@ -39,7 +39,7 @@ services:
     entrypoint: ''
     volumes:
       - django_static:/opt/static/
-      - ./core:/opt/core
+#      - ./core:/opt/core
     command: python3 manage.py collectstatic -c --no-input
 
   api:
