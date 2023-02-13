@@ -71,6 +71,3 @@ services:
 volumes:
   diploma_postgres_data:
   django_static:
-
-
-
