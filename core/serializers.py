@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.password_validation import validate_password
 
@@ -48,21 +48,14 @@ class LoginSerializer(serializers.ModelSerializer):
         fields = ["id", "username", "password", "first_name", "last_name", "email"]
         read_only_fields = ["id", "first_name", "last_name", "email"]
 
-    def validate_credentials(self, attrs):
-        username = attrs.get("username")
-        password = attrs.get("password")
-        user = authenticate(
-            request=self.context.get("request"),
-            username=username,
-            password=password
-        )
+    def create(self, validated_data):
+        username = validated_data["username"]
+        password = validated_data["password"]
+        user = authenticate(validated_data, username=username, password=password)
+
         if not user:
             raise AuthenticationFailed
-        attrs["user"] = user
-
-        login(request=self.context.get("request"), user=attrs["user"])
-
-        return attrs
+        return user
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
