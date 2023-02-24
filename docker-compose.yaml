@@ -21,7 +21,8 @@ services:
 
 
   frontend:
-    image: sermalenk/skypro-front:lesson-35
+    image: sermalenk/skypro-front:lesson-36
+    # sermalenk/skypro-front:lesson-36
     ports:
       - "80:80"
     volumes:
@@ -44,6 +45,7 @@ services:
     volumes:
       - django_static:/opt/static/
       - ./core:/opt/core
+      - ./goals:/opt/goals
     command: python3 manage.py collectstatic -c --no-input
 
   api:
@@ -57,6 +59,7 @@ services:
     volumes:
       - ./todolist:/opt/todolist
       - ./core:/opt/core
+      - ./goals:/opt/goals
     ports:
       - "8000:8000"
     depends_on:
