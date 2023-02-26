@@ -58,8 +58,6 @@ class Goal(DatesModelMixin):
     due_date = models.DateTimeField(verbose_name="Дата дедлайна", null=True, blank=True)
     is_deleted = models.BooleanField(verbose_name="Удалена", default=False)
 
-    # comments = models.ManyToManyField("GoalComment", related_name="comments_for_goal")
-
     class Meta:
         verbose_name = "Цель"
         verbose_name_plural = "Цели"

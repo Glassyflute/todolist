@@ -25,6 +25,7 @@ class CommentGoalNameFilter(rest_framework.FilterSet):
         model = GoalComment
         fields = {
             "goal": ("in",),
+            "user": ("in",),
         }
 
     filter_overrides = {

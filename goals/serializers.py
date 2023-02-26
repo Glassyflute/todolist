@@ -57,36 +57,20 @@ class GoalCommentSerializer(serializers.ModelSerializer):
         model = GoalComment
         fields = "__all__"
         read_only_fields = ("id", "created", "updated", "user")
-    # comments_for_goal
 
 
 class GoalCreateSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
-    comments = serializers.SerializerMethodField()
+    goalcomment = serializers.SerializerMethodField()
 
-    def get_comments(self, goal):
+    def get_goalcomment(self, goal):
         return [item.text for item in goal.goal_comment.all()]
-    # comments = serializers.CharField() with error
-
-    # user = UserProfileSerializer(read_only=True)
-    # comments = serializers.SlugRelatedField(
-    #     required=False,
-    #     many=True,
-    #     # queryset=GoalComment.objects.filter(user__username=user.context["request"].user.username),
-    #     queryset=GoalComment.objects.all(),
-    #     slug_field="text"
-    # )
 
     class Meta:
         model = Goal
         read_only_fields = ("id", "created", "updated", "user", "is_deleted")
         fields = "__all__"
-        # exclude = ["comments"]
-
-    # def is_valid(self, raise_exception=False):
-    #     self._comments = self.initial_data.pop("comments", [])
-    #     return super().is_valid(raise_exception=raise_exception)
 
     # Проверяем, что пользователь может назначить категорию только из своих актуальных категорий.
     # Если категория остается пустой при создании, то ей назначается Категория=Default по умолчанию.
@@ -112,29 +96,11 @@ class GoalCreateSerializer(serializers.ModelSerializer):
 
 class GoalSerializer(serializers.ModelSerializer):
     user = UserProfileSerializer(read_only=True)
+    goalcomment = serializers.SerializerMethodField()
 
-    # comments = serializers.SlugRelatedField(
-    #     many=True,
-    #     read_only=True,
-    #     slug_field="text"
-    # )
-    # comments = serializers.CharField()  # goals.GoalComment.None
-
-    comments = serializers.SerializerMethodField()
-    def get_comments(self, goal):
+    def get_goalcomment(self, goal):
         return [item.text for item in goal.goal_comment.all()]
 
-    ## отображать список комментов на карточке Цели
-    # queryset=GoalComment.objects.filter(user_id=self.context["request"].user.pk)
-    # comments = GoalCommentSerializer(many=True, read_only=True)
-
-    # comments = GoalCommentSerializer(many=True,
-    #                                  queryset=GoalComment.objects.filter(user_id=self.context["request"].user.pk))
-
-    # Goal.objects.filter(user_id=self.request.user.pk,
-    #                     category__is_deleted=False,
-    #                     comments=GoalComment.objects.filter(user_id=self.request.user.pk)
-    #                     ).exclude(status=Goal.Status.archived)
     class Meta:
         model = Goal
         read_only_fields = ("id", "created", "updated", "user", "is_deleted")

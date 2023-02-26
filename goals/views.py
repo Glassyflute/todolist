@@ -80,19 +80,9 @@ class GoalView(RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-
-        # if comments not null, then show new qs
-        # return Goal.objects.filter(user_id=self.request.user.pk,
-        #                            category__is_deleted=False,
-        #                            comments=GoalComment.objects.filter(user_id=self.request.user.pk)
-        #                            ).exclude(status=Goal.Status.archived)
-
         return Goal.objects.filter(user_id=self.request.user.pk,
                                    category__is_deleted=False
                                    ).exclude(status=Goal.Status.archived)
-
-    # Goal.objects.filter(comments=GoalComment.objects.filter(user_id=self.request.user.pk))
-    # GoalComment.objects.filter(user_id=self.request.user.pk)
 
     def perform_update(self, serializer):
         serializer.save()
@@ -119,7 +109,7 @@ class GoalCommentListView(ListAPIView):
     pagination_class = LimitOffsetPagination
 
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
-    # фильтрация ниже по названию цели
+    # фильтрация ниже по названию цели и пользователю
     filterset_class = CommentGoalNameFilter
     ordering_fields = ["created"]
     ordering = ["text"]
