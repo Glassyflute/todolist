@@ -33,9 +33,6 @@ class GoalAdmin(admin.ModelAdmin):
         ("Действия пользователя", {
             "fields": ("created", "updated", "user")
         }),
-        # ("Комментарии пользователя", {
-        #     "fields": ("comments",)
-        # }),
     )
 
 
