@@ -1,35 +1,31 @@
+from datetime import *
+from django.utils import timezone
 from rest_framework import serializers
 
 from core.serializers import UserProfileSerializer
 from goals.models import GoalCategory, Goal, GoalComment
 
 
-# not GoalCreateSerializer, as model =GoalCategory below
 class GoalCategoryCreateSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = GoalCategory
-        read_only_fields = ("id", "created", "updated", "user")
+        read_only_fields = ("id", "created", "updated", "user", "is_deleted")
         fields = "__all__"
 
 
-# for list and detail view of categories
 class GoalCategorySerializer(serializers.ModelSerializer):
-    # убрали логику с подстановкой текущего пользователя в поле user.
+    # Убрана логика с подстановкой текущего пользователя в поле user.
+    # Информация по пользователю выводится из сериализатора по пользователю.
     user = UserProfileSerializer(read_only=True)
 
     class Meta:
         model = GoalCategory
         fields = "__all__"
-        read_only_fields = ("id", "created", "updated", "user")
+        read_only_fields = ("id", "created", "updated", "user", "is_deleted")
 
 
-
-#######################################
-
-#################################
-# POST for Comment
 class GoalCommentCreateSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
@@ -38,77 +34,129 @@ class GoalCommentCreateSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "created", "updated", "user")
         fields = "__all__"
 
-    # проверять, что пользователь может создать комментарий только к своим актуальным целям
+    # проверяем, что пользователь может создать комментарий только к своим актуальным целям
     def validate_goal(self, value):
         if value.is_deleted:
-            raise serializers.ValidationError("not allowed in deleted goals")
+            raise serializers.ValidationError("User is prohibited to comment on deleted goals.")
 
         if value.user != self.context["request"].user:
-            raise serializers.ValidationError("not owner of goal")
+            raise serializers.ValidationError("User is not owner of this goal.")
 
         return value
 
 
-#  list and detail view for Comments, used also for updating/deleting instance
 class GoalCommentSerializer(serializers.ModelSerializer):
     # убрали логику с подстановкой текущего пользователя в поле user.
     user = UserProfileSerializer(read_only=True)
-    # user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    goal = serializers.SerializerMethodField()
+
+    def get_goal(self, goalcomment):
+        return goalcomment.goal.title
 
     class Meta:
         model = GoalComment
         fields = "__all__"
         read_only_fields = ("id", "created", "updated", "user")
-
-    # goal можно текстом показывать
-
+    # comments_for_goal
 
 
-##################################
-# added POST for goals
 class GoalCreateSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    # user = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
 
-    # category = serializers.SerializerMethodField()
-    # def get_category(self, goal):
-    #     return goal.category.title
+    comments = serializers.SerializerMethodField()
+
+    def get_comments(self, goal):
+        return [item.text for item in goal.goal_comment.all()]
+    # comments = serializers.CharField() with error
+
+    # user = UserProfileSerializer(read_only=True)
+    # comments = serializers.SlugRelatedField(
+    #     required=False,
+    #     many=True,
+    #     # queryset=GoalComment.objects.filter(user__username=user.context["request"].user.username),
+    #     queryset=GoalComment.objects.all(),
+    #     slug_field="text"
+    # )
 
     class Meta:
         model = Goal
-        read_only_fields = ("id", "created", "updated", "user")
+        read_only_fields = ("id", "created", "updated", "user", "is_deleted")
         fields = "__all__"
+        # exclude = ["comments"]
 
-    # проверять, что категория создаваемой цели принадлежит пользователю =не может создать цель в чужой категории
+    # def is_valid(self, raise_exception=False):
+    #     self._comments = self.initial_data.pop("comments", [])
+    #     return super().is_valid(raise_exception=raise_exception)
+
+    # Проверяем, что пользователь может назначить категорию только из своих актуальных категорий.
+    # Если категория остается пустой при создании, то ей назначается Категория=Default по умолчанию.
     def validate_category(self, value):
         if value is not None:
             if value.is_deleted:
-                raise serializers.ValidationError("not allowed in deleted category")
+                raise serializers.ValidationError("User is prohibited to assign deleted categories for goals.")
 
             # проверяем, что категория создаваемой цели принадлежит пользователю,
             # т.е. пользователь не может создать цель в чужой категории
             if value.user != self.context["request"].user:
-                raise serializers.ValidationError("not owner of category")
+                raise serializers.ValidationError("User is not owner of this category.")
         else:
             value = GoalCategory.objects.create(title="Default", user=self.context["request"].user)
 
         return value
 
-    # какие проблемы: дату обязательно ставить, можно вчерашним днем и тп создать дедлайн
+    def validate_due_date(self, value):
+        if value < timezone.now():
+            raise serializers.ValidationError("Due date cannot be in the past.")
+        return value
 
 
-# added list /detail for goals
 class GoalSerializer(serializers.ModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    # можно добавить вывод имени пользователя под целью
-    # status, priority, category - можно текстом показывать; is_deleted не показывать или др видом
-    comments = GoalCommentSerializer(many=True)
+    user = UserProfileSerializer(read_only=True)
 
+    # comments = serializers.SlugRelatedField(
+    #     many=True,
+    #     read_only=True,
+    #     slug_field="text"
+    # )
+    # comments = serializers.CharField()  # goals.GoalComment.None
+
+    comments = serializers.SerializerMethodField()
+    def get_comments(self, goal):
+        return [item.text for item in goal.goal_comment.all()]
+
+    ## отображать список комментов на карточке Цели
+    # queryset=GoalComment.objects.filter(user_id=self.context["request"].user.pk)
+    # comments = GoalCommentSerializer(many=True, read_only=True)
+
+    # comments = GoalCommentSerializer(many=True,
+    #                                  queryset=GoalComment.objects.filter(user_id=self.context["request"].user.pk))
+
+    # Goal.objects.filter(user_id=self.request.user.pk,
+    #                     category__is_deleted=False,
+    #                     comments=GoalComment.objects.filter(user_id=self.request.user.pk)
+    #                     ).exclude(status=Goal.Status.archived)
     class Meta:
         model = Goal
-        read_only_fields = ("id", "created", "updated", "user")
+        read_only_fields = ("id", "created", "updated", "user", "is_deleted")
         fields = "__all__"
 
+    # Проверяем, что пользователь может назначить категорию только из своих актуальных категорий.
+    # Если категория выбрана как пустая, то ей назначается Категория=Default по умолчанию.
+    def validate_category(self, value):
+        if value is not None:
+            if value.is_deleted:
+                raise serializers.ValidationError("User is prohibited to assign deleted categories for goals.")
 
+            # проверяем, что категория создаваемой цели принадлежит пользователю,
+            # т.е. пользователь не может создать цель в чужой категории
+            if value.user != self.context["request"].user:
+                raise serializers.ValidationError("User is not owner of this category.")
+        else:
+            value = GoalCategory.objects.create(title="Default", user=self.context["request"].user)
 
-##############
+        return value
+
+    def validate_due_date(self, value):
+        if value < timezone.now():
+            raise serializers.ValidationError("Due date cannot be in the past.")
+        return value

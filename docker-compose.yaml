@@ -22,7 +22,6 @@ services:
 
   frontend:
     image: sermalenk/skypro-front:lesson-36
-    # sermalenk/skypro-front:lesson-36
     ports:
       - "80:80"
     volumes:
