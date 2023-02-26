@@ -21,11 +21,10 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("oauth/", include("social_django.urls", namespace="social")),
     path("core/", include("core.urls"), name="core"),
-    path("goals/", include("goals.urls")),
+    path("goals/", include("goals.urls"), name="goals"),
 ]
 
 if settings.DEBUG:
     urlpatterns += [
         path("api-auth/", include("rest_framework.urls")),
     ]
-

@@ -116,10 +116,9 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTH_USER_MODEL = 'core.User'
 
 # REST_FRAMEWORK = {
-#     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-#     "PAGE_SIZE": 4,
+#     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
 # }
-# 'rest_framework.pagination.LimitOffsetPagination'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
