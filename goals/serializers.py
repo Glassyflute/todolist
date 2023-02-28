@@ -95,7 +95,7 @@ class GoalCreateSerializer(serializers.ModelSerializer):
         if value:
             if value < timezone.now():
                 raise serializers.ValidationError("Due date cannot be in the past.")
-            return value
+        return value
 
 
 class GoalSerializer(serializers.ModelSerializer):
@@ -130,4 +130,4 @@ class GoalSerializer(serializers.ModelSerializer):
         if value:
             if value < timezone.now():
                 raise serializers.ValidationError("Due date cannot be in the past.")
-            return value
+        return value
