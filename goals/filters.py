@@ -20,14 +20,4 @@ class GoalDateFilter(rest_framework.FilterSet):
     }
 
 
-class CommentGoalNameFilter(rest_framework.FilterSet):
-    class Meta:
-        model = GoalComment
-        fields = {
-            "goal": ("in",),
-            "user": ("in",),
-        }
 
-    filter_overrides = {
-        models.CharField: {"filter_class": django_filters.AllValuesFilter},
-    }

@@ -5,7 +5,7 @@ from rest_framework import permissions, filters
 
 from rest_framework.pagination import LimitOffsetPagination
 
-from goals.filters import GoalDateFilter, CommentGoalNameFilter
+from goals.filters import GoalDateFilter
 from goals.models import GoalCategory, Goal, GoalComment
 
 from goals.serializers import GoalCategoryCreateSerializer, GoalCategorySerializer, GoalCreateSerializer, \
@@ -109,8 +109,7 @@ class GoalCommentListView(ListAPIView):
     pagination_class = LimitOffsetPagination
 
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
-    # фильтрация ниже по названию цели и пользователю
-    filterset_class = CommentGoalNameFilter
+    filterset_fields = ['goal']
     ordering_fields = ["created"]
     ordering = ["text"]
     search_fields = ["text"]
