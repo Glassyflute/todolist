@@ -1,4 +1,7 @@
+import datetime
 from datetime import *
+from typing import Optional, Union
+
 from django.utils import timezone
 from rest_framework import serializers
 
@@ -89,9 +92,10 @@ class GoalCreateSerializer(serializers.ModelSerializer):
         return value
 
     def validate_due_date(self, value):
-        if value < timezone.now():
-            raise serializers.ValidationError("Due date cannot be in the past.")
-        return value
+        if value:
+            if value < timezone.now():
+                raise serializers.ValidationError("Due date cannot be in the past.")
+            return value
 
 
 class GoalSerializer(serializers.ModelSerializer):
@@ -123,6 +127,7 @@ class GoalSerializer(serializers.ModelSerializer):
         return value
 
     def validate_due_date(self, value):
-        if value < timezone.now():
-            raise serializers.ValidationError("Due date cannot be in the past.")
-        return value
+        if value:
+            if value < timezone.now():
+                raise serializers.ValidationError("Due date cannot be in the past.")
+            return value
