@@ -2,10 +2,13 @@ import django_filters
 from django.db import models
 from django_filters import rest_framework
 
-from goals.models import Goal, GoalComment
+from goals.models import Goal
 
 
 class GoalDateFilter(rest_framework.FilterSet):
+    """
+    Осуществляет фильтрацию по начальной и конечной датам дедлайна для цели, категории цели, статусу и приоритету цели.
+    """
     class Meta:
         model = Goal
         fields = {

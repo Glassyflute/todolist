@@ -27,7 +27,6 @@ class LoginView(CreateAPIView):
         return Response(serializer.data)
 
 
-
 class UserProfileView(RetrieveUpdateDestroyAPIView):
     """
     Страница профиля пользователя

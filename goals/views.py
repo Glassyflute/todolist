@@ -13,12 +13,19 @@ from goals.serializers import GoalCategoryCreateSerializer, GoalCategorySerializ
 
 
 class GoalCategoryCreateView(CreateAPIView):
+    """
+    Позволяет создать категорию пользователю со статусом IsAuthenticated.
+    """
     model = GoalCategory
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = GoalCategoryCreateSerializer
 
 
 class GoalCategoryListView(ListAPIView):
+    """
+    Позволяет видеть список категорий пользователю со статусом IsAuthenticated. Встроены сортировка, фильтрация по
+    названию актуальной категории.
+    """
     model = GoalCategory
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = GoalCategorySerializer
@@ -34,6 +41,11 @@ class GoalCategoryListView(ListAPIView):
 
 
 class GoalCategoryView(RetrieveUpdateDestroyAPIView):
+    """
+    Позволяет пользователю со статусом IsAuthenticated видеть детальную информацию по актуальной категории, обновлять
+    или удалять категорию. При удалении категории все цели этой категории переходят в статус «Архив» и не показываются
+    в списке актуальных целей, однако остаются в БД.
+    """
     model = GoalCategory
     serializer_class = GoalCategorySerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -41,23 +53,29 @@ class GoalCategoryView(RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return GoalCategory.objects.filter(user=self.request.user, is_deleted=False)
 
-    # При удалении категории все цели этой категории переходят в статус «Архив», остаются в БД
     def perform_destroy(self, instance):
         with transaction.atomic():
             instance.is_deleted = True
             instance.save()
-            # перемещение цели в архив при удалении
             instance.goals.update(status=Goal.Status.archived)
             return instance
 
 
 class GoalCreateView(CreateAPIView):
+    """
+    Позволяет пользователю со статусом IsAuthenticated создать цель.
+    """
     model = Goal
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = GoalCreateSerializer
 
 
 class GoalListView(ListAPIView):
+    """
+    Позволяет пользователю со статусом IsAuthenticated видеть список актуальных целей. Встроены сортировка по приоритету
+    и дедлайну, а также фильтрация по названию и описанию цели. При удалении категории все цели этой категории переходят
+    в статус «Архив» и не показываются в списке актуальных целей, однако остаются в БД.
+    """
     model = Goal
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = GoalSerializer
@@ -75,6 +93,11 @@ class GoalListView(ListAPIView):
 
 
 class GoalView(RetrieveUpdateDestroyAPIView):
+    """
+    Позволяет пользователю со статусом IsAuthenticated видеть детальную информацию по актуальной цели, обновлять
+    или удалять цель. Цель не показывается, если присвоенная ей категория имеет статус удалена/архивирована, однако
+    подобные цели и категории остаются в БД.
+    """
     model = Goal
     serializer_class = GoalSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -90,19 +113,25 @@ class GoalView(RetrieveUpdateDestroyAPIView):
     def perform_destroy(self, instance):
         with transaction.atomic():
             instance.is_deleted = True
-            # перемещение цели в архив при удалении
             instance.status = Goal.Status.archived
             instance.save()
             return instance
 
 
 class GoalCommentCreateView(CreateAPIView):
+    """
+    Позволяет пользователю со статусом IsAuthenticated создать комментарий к цели.
+    """
     model = GoalComment
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = GoalCommentCreateSerializer
 
 
 class GoalCommentListView(ListAPIView):
+    """
+    Позволяет пользователю со статусом IsAuthenticated видеть список комментариев. Встроены сортировка, фильтрация по
+    тексту комментария и цели. Комментарии удаляются полностью при удалении Пользователя или Цели, не сохраняются в БД.
+    """
     model = GoalComment
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = GoalCommentSerializer
@@ -119,6 +148,11 @@ class GoalCommentListView(ListAPIView):
 
 
 class GoalCommentView(RetrieveUpdateDestroyAPIView):
+    """
+    Позволяет пользователю со статусом IsAuthenticated видеть детальную информацию по существующему комментарию,
+    обновлять или удалять комментарий. Комментарии удаляются полностью при удалении Пользователя или Цели, не
+    сохраняются в БД.
+    """
     model = GoalComment
     serializer_class = GoalCommentSerializer
     permission_classes = [permissions.IsAuthenticated]
