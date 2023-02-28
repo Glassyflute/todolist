@@ -16,6 +16,9 @@ class PasswordField(serializers.CharField):
 
 
 class UserSignUpSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор получает данные пользователя для регистрации, проверяет и шифрует пароль.
+    """
     password = PasswordField(required=True)
     password_repeat = PasswordField(required=True)
 
@@ -40,6 +43,9 @@ class UserSignUpSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор получает username, password от пользователя и проводит аутентификацию пользователя.
+    """
     username = serializers.CharField(required=True)
     password = PasswordField(required=True)
 
@@ -65,6 +71,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class PasswordUpdateSerializer(serializers.Serializer):
+    """
+    Сериализатор получает старый и новый пароли пользователя, сохраняет новый пароль.
+    """
     old_password = PasswordField(required=True)
     new_password = PasswordField(required=True)
 

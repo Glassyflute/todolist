@@ -5,21 +5,27 @@ from core.models import User
 
 
 class DatesModelMixin(models.Model):
+    """
+    Класс DatesModelMixin присваивает дату создания при создании модели и обновляет дату обновления при каждом
+    обновлении модели. Для абстрактного класса DatesModelMixin не создается таблица в БД.
+    """
     created = models.DateTimeField(verbose_name="Дата создания")
     updated = models.DateTimeField(verbose_name="Дата последнего обновления")
 
     class Meta:
         abstract = True
-        # Для абстрактного класса не создается таблица в БД
 
     def save(self, *args, **kwargs):
-        if not self.id:  # Когда модель только создается – у нее нет id
+        if not self.id:
             self.created = timezone.now()
-        self.updated = timezone.now()  # Каждый раз, когда вызывается save, проставляем свежую дату обновления
+        self.updated = timezone.now()
         return super().save(*args, **kwargs)
 
 
 class GoalCategory(DatesModelMixin):
+    """
+    Класс Категория создается пользователем.
+    """
     title = models.CharField(verbose_name="Название", max_length=255)
     user = models.ForeignKey(User, verbose_name="Автор", on_delete=models.PROTECT)
     is_deleted = models.BooleanField(verbose_name="Удалена", default=False)
@@ -33,6 +39,9 @@ class GoalCategory(DatesModelMixin):
 
 
 class Goal(DatesModelMixin):
+    """
+    Класс Цель создается пользователем в соответствии с указанными полями, включая поле Категория.
+    """
     class Status(models.IntegerChoices):
         to_do = 1, "К выполнению"
         in_progress = 2, "В процессе"
@@ -67,7 +76,10 @@ class Goal(DatesModelMixin):
 
 
 class GoalComment(DatesModelMixin):
-    # комментарии удаляются полностью при удалении Пользователя или Цели, не сохраняются в БД.
+    """
+    Класс Комментарий создается пользователем к выбранной цели. Комментарии удаляются полностью при удалении
+    Пользователя или Цели, не сохраняются в БД.
+    """
     user = models.ForeignKey(User, verbose_name="Автор", on_delete=models.CASCADE)
     goal = models.ForeignKey(Goal, verbose_name="Цель", on_delete=models.CASCADE, related_name="goal_comment")
     text = models.TextField(verbose_name="Текст комментария", max_length=1000)

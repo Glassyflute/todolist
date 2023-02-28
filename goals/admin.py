@@ -2,8 +2,11 @@ from django.contrib import admin
 from goals.models import GoalCategory, Goal, GoalComment
 
 
-# админка для категорий
 class GoalCategoryAdmin(admin.ModelAdmin):
+    """
+    Админка для категорий позволяет поиск по названию категории, username пользователя. Есть возможность фильтровать
+    категории по статусу удалена/архивирована.
+    """
     list_display = ("title", "user", "created", "updated", "is_deleted")
     search_fields = ("title", "user__username")
     list_filter = ("is_deleted",)
@@ -13,8 +16,11 @@ class GoalCategoryAdmin(admin.ModelAdmin):
 admin.site.register(GoalCategory, GoalCategoryAdmin)
 
 
-# админка для целей
 class GoalAdmin(admin.ModelAdmin):
+    """
+    Админка для целей позволяет поиск по названию и описанию цели, username пользователя. Есть возможность фильтровать
+    цели по статусу, приоритету, дедлайну.
+    """
     list_display = ("title", "user", "created", "updated", "description", "category",
                     "status", "priority", "due_date", "is_deleted")
     search_fields = ("title", "description", "user__username")
@@ -39,11 +45,12 @@ class GoalAdmin(admin.ModelAdmin):
 admin.site.register(Goal, GoalAdmin)
 
 
-# админка для комментариев
 class GoalCommentAdmin(admin.ModelAdmin):
+    """
+    Админка для комментариев позволяет поиск по тексту комментария к цели, username пользователя, названию цели.
+    """
     list_display = ("text", "goal", "user", "created", "updated")
     search_fields = ("text", "user__username", "goal__title")
-    # list_filter = ("goal",)
     readonly_fields = ("created", "updated")
     fieldsets = (
         (None, {
