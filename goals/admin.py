@@ -7,8 +7,8 @@ class GoalCategoryAdmin(admin.ModelAdmin):
     Админка для категорий позволяет поиск по названию категории, username пользователя. Есть возможность фильтровать
     категории по статусу удалена/архивирована.
     """
-    list_display = ("title", "user", "created", "updated", "is_deleted")
-    search_fields = ("title", "user__username")
+    list_display = ("title", "user", "board", "created", "updated", "is_deleted")
+    search_fields = ("title", "user__username", "board__participants__user__username")
     list_filter = ("is_deleted",)
     readonly_fields = ("created", "updated")
 
@@ -23,7 +23,7 @@ class GoalAdmin(admin.ModelAdmin):
     """
     list_display = ("title", "user", "created", "updated", "description", "category",
                     "status", "priority", "due_date", "is_deleted")
-    search_fields = ("title", "description", "user__username")
+    search_fields = ("title", "description", "category__board__participants__user__username")
     list_filter = ("status", "priority", "due_date", "is_deleted")
     readonly_fields = ("created", "updated")
     fieldsets = (
@@ -50,7 +50,7 @@ class GoalCommentAdmin(admin.ModelAdmin):
     Админка для комментариев позволяет поиск по тексту комментария к цели, username пользователя, названию цели.
     """
     list_display = ("text", "goal", "user", "created", "updated")
-    search_fields = ("text", "user__username", "goal__title")
+    search_fields = ("text", "goal__category__board__participants__user__username", "goal__title")
     readonly_fields = ("created", "updated")
     fieldsets = (
         (None, {
@@ -62,30 +62,15 @@ class GoalCommentAdmin(admin.ModelAdmin):
 admin.site.register(GoalComment, GoalCommentAdmin)
 
 
-
-###################################################################
-# class BoardAdmin(admin.ModelAdmin):
-#     """
-#     Админка для досок позволяет поиск по названию доски. Есть возможность фильтровать доски по статусу
-#     удалена/архивирована.
-#     """
-#     list_display = ("title", "user__username", "created", "updated", "is_deleted")
-#     search_fields = ("title", "user__username", "participants__user__username")
-#     list_filter = ("is_deleted",)
-#     readonly_fields = ("created", "updated")
-#
-#
-# admin.site.register(Board, BoardAdmin)
+class BoardAdmin(admin.ModelAdmin):
+    """
+    Админка для досок позволяет поиск по названию доски и username пользователя. Есть возможность фильтровать доски по
+    статусу удалена/архивирована.
+    """
+    list_display = ("title", "created", "updated", "is_deleted")
+    search_fields = ("title", "participants__user__username")
+    list_filter = ("is_deleted",)
+    readonly_fields = ("created", "updated")
 
 
-# class BoardParticipantAdmin(admin.ModelAdmin):
-#     """
-#     Админка для BoardParticipant позволяет поиск по xxxxxxxx. Есть возможность фильтровать xxxxx по xxxxx.
-#     """
-#     list_display = ("user", "created", "updated", "is_deleted")
-#     search_fields = ("user__username", "role", "board")
-#     list_filter = ("is_deleted",)
-#     readonly_fields = ("created", "updated")
-#
-#
-# admin.site.register(BoardParticipant, BoardParticipantAdmin)
+admin.site.register(Board, BoardAdmin)

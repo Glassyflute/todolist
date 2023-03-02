@@ -16,11 +16,10 @@ urlpatterns = [
     path("goal_comment/list", views.GoalCommentListView.as_view()),
     path("goal_comment/<int:pk>", views.GoalCommentView.as_view()),
 
-    # path("board/create", views.BoardCreateView.as_view()),
-    # path("board/list", views.BoardListView.as_view()),
-    # path("board/<int:pk>", views.BoardView.as_view()),
+    path("board/create", views.BoardCreateView.as_view()),
+    path("board/list", views.BoardListView.as_view()),
+    path("board/<int:pk>", views.BoardView.as_view()),
 
-    # path("board/create", views.BoardCreateView.as_view()),
-    # path("board/list", views.BoardListView.as_view()),
-    # path("board/<int:pk>", views.BoardView.as_view()),
+    # для проверки пар доска-юзер на текущем этапе в бэкэнде
+    path("board_participant/list", views.BoardParticipantListView.as_view()),
 ]
