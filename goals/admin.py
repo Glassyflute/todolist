@@ -1,5 +1,5 @@
 from django.contrib import admin
-from goals.models import GoalCategory, Goal, GoalComment
+from goals.models import GoalCategory, Goal, GoalComment, Board, BoardParticipant
 
 
 class GoalCategoryAdmin(admin.ModelAdmin):
@@ -60,3 +60,32 @@ class GoalCommentAdmin(admin.ModelAdmin):
 
 
 admin.site.register(GoalComment, GoalCommentAdmin)
+
+
+
+###################################################################
+class BoardAdmin(admin.ModelAdmin):
+    """
+    Админка для досок позволяет поиск по названию доски. Есть возможность фильтровать доски по статусу
+    удалена/архивирована.
+    """
+    list_display = ("title", "user", "created", "updated", "is_deleted")
+    search_fields = ("title", "user__username", "participants__user__username")
+    list_filter = ("is_deleted",)
+    readonly_fields = ("created", "updated")
+
+
+admin.site.register(Board, BoardAdmin)
+
+
+# class BoardParticipantAdmin(admin.ModelAdmin):
+#     """
+#     Админка для BoardParticipant позволяет поиск по xxxxxxxx. Есть возможность фильтровать xxxxx по xxxxx.
+#     """
+#     list_display = ("user", "created", "updated", "is_deleted")
+#     search_fields = ("user__username", "role", "board")
+#     list_filter = ("is_deleted",)
+#     readonly_fields = ("created", "updated")
+#
+#
+# admin.site.register(BoardParticipant, BoardParticipantAdmin)
