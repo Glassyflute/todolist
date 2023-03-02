@@ -64,18 +64,18 @@ admin.site.register(GoalComment, GoalCommentAdmin)
 
 
 ###################################################################
-class BoardAdmin(admin.ModelAdmin):
-    """
-    Админка для досок позволяет поиск по названию доски. Есть возможность фильтровать доски по статусу
-    удалена/архивирована.
-    """
-    list_display = ("title", "user", "created", "updated", "is_deleted")
-    search_fields = ("title", "user__username", "participants__user__username")
-    list_filter = ("is_deleted",)
-    readonly_fields = ("created", "updated")
-
-
-admin.site.register(Board, BoardAdmin)
+# class BoardAdmin(admin.ModelAdmin):
+#     """
+#     Админка для досок позволяет поиск по названию доски. Есть возможность фильтровать доски по статусу
+#     удалена/архивирована.
+#     """
+#     list_display = ("title", "user__username", "created", "updated", "is_deleted")
+#     search_fields = ("title", "user__username", "participants__user__username")
+#     list_filter = ("is_deleted",)
+#     readonly_fields = ("created", "updated")
+#
+#
+# admin.site.register(Board, BoardAdmin)
 
 
 # class BoardParticipantAdmin(admin.ModelAdmin):

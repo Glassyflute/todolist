@@ -4,6 +4,7 @@ from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers
 
+from core.models import User
 from core.serializers import UserProfileSerializer
 from goals.models import GoalCategory, Goal, GoalComment, Board, BoardParticipant
 
@@ -155,84 +156,83 @@ class GoalSerializer(serializers.ModelSerializer):
 
 
 #####################################################
-class BoardParticipantSerializer(serializers.ModelSerializer):
-    role = serializers.ChoiceField(
-        required=True, choices=BoardParticipant.editable_choices
-    )
-    user = serializers.SlugRelatedField(
-        slug_field="username", queryset=User.objects.all()
-    )
-
-    class Meta:
-        model = BoardParticipant
-        fields = "__all__"
-        read_only_fields = ("id", "created", "updated", "board")
+# class BoardParticipantSerializer(serializers.ModelSerializer):
+#     role = serializers.ChoiceField(required=True, choices=BoardParticipant.editable_choices)
+#     user = serializers.SlugRelatedField(slug_field="username", queryset=User.objects.all())
+#
+#     class Meta:
+#         model = BoardParticipant
+#         fields = "__all__"
+#         read_only_fields = ("id", "created", "updated", "board")
 
 
 
-class BoardCreateSerializer(serializers.ModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+# class BoardCreateSerializer(serializers.ModelSerializer):
+#     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+#
+#     class Meta:
+#         model = Board
+#         read_only_fields = ("id", "created", "updated")
+#         fields = "__all__"
+#
+#     def create(self, validated_data):
+#         user = validated_data.pop("user")
+#         board = Board.objects.create(**validated_data)
+#         # при создании доски сразу создаем BoardParticipant с ролью владельца
+#         BoardParticipant.objects.create(user=user, board=board, role=BoardParticipant.Role.owner)
+#         return board
+#
+#
+# class BoardListSerializer(serializers.ModelSerializer):
+#
+#     class Meta:
+#         model = Board
+#         # read_only_fields = ("id", "created", "updated")
+#         fields = "__all__"
+#
+#
+# class BoardSerializer(serializers.ModelSerializer):
+#     participants = BoardParticipantSerializer(many=True)
+#     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+#
+#     class Meta:
+#         model = Board
+#         fields = "__all__"
+#         read_only_fields = ("id", "created", "updated")
+#
+#     def update(self, instance, validated_data):
+#         owner = validated_data.pop("user")
+#         old_participants = instance.participants.exclude(user=owner)
+#
+#         new_participants = validated_data.pop("participants")
+#         new_by_username = {participant["user"]: participant for participant in new_participants}
+#
+#         with transaction.atomic():
+#             for old_participant in old_participants:
+#                 # удаляем неактуальных участников доски, не затрагивая текущего пользователя /владельца доски
+#                 if old_participant["user"] not in new_by_username:
+#                     old_participant.delete()
+#                 else:
+#                     # работаем с уже существующими участниками доски по изменениям их ролей, не затрагивая текущего
+#                     # пользователя /владельца доски
+#                     for participant_dict in new_by_username.values():
+#                         if participant_dict["user"] == old_participant["user"]:
+#                             old_participant["role"] = participant_dict["role"]
+#                             old_participant.save()
+#
+#                     new_by_username.pop(old_participant["user"])
+#
+#             for new_participant_dict in new_by_username.values():
+#                 BoardParticipant.objects.create(user=new_participant_dict["user"], role=new_participant_dict["role"],
+#                                                 board=instance)
+#             if validated_data["title"]:
+#                 instance.title = validated_data["title"]
+#             instance.save()
+#
+#         return instance
 
-    class Meta:
-        model = Board
-        read_only_fields = ("id", "created", "updated")
-        fields = "__all__"
-
-    def create(self, validated_data):
-        user = validated_data.pop("user")
-        board = Board.objects.create(**validated_data)
-        # при создании доски сразу создаем BoardParticipant с ролью владельца
-        BoardParticipant.objects.create(user=user, board=board, role=BoardParticipant.Role.owner)
-        return board
 
 
-class BoardListSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Board
-        # read_only_fields = ("id", "created", "updated")
-        fields = "__all__"
-
-
-class BoardSerializer(serializers.ModelSerializer):
-    participants = BoardParticipantSerializer(many=True)
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-
-    class Meta:
-        model = Board
-        fields = "__all__"
-        read_only_fields = ("id", "created", "updated")
-
-    def update(self, instance, validated_data):
-        owner = validated_data.pop("user")
-        old_participants = instance.participants.exclude(user=owner)
-
-        new_participants = validated_data.pop("participants")
-        new_by_username = {participant["user"]: participant for participant in new_participants}
-
-        with transaction.atomic():
-            for old_participant in old_participants:
-                # удаляем неактуальных участников доски, не затрагивая текущего пользователя /владельца доски
-                if old_participant["user"] not in new_by_username:
-                    old_participant.delete()
-                else:
-                    # работаем с уже существующими участниками доски по изменениям их ролей, не затрагивая текущего
-                    # пользователя /владельца доски
-                    for participant_dict in new_by_username.values():
-                        if participant_dict["user"] == old_participant["user"]:
-                            old_participant["role"] = participant_dict["role"]
-                            old_participant.save()
-
-                    new_by_username.pop(old_participant["user"])
-
-            for new_participant_dict in new_by_username.values():
-                BoardParticipant.objects.create(user=new_participant_dict["user"], role=new_participant_dict["role"],
-                                                board=instance)
-            if validated_data["title"]:
-                instance.title = validated_data["title"]
-            instance.save()
-
-        return instance
 
         # guidance below
         # owner = validated_data.pop("user")
