@@ -82,15 +82,11 @@ class GoalCategorySerializer(serializers.ModelSerializer):
     request.method не равен GET.
     """
     user = UserProfileSerializer(read_only=True)
-    board = serializers.SerializerMethodField()
-
-    def get_board(self, goalcategory):
-        return goalcategory.board.title
 
     class Meta:
         model = GoalCategory
         fields = "__all__"
-        read_only_fields = ("id", "created", "updated", "is_deleted")
+        read_only_fields = ("id", "created", "updated", "is_deleted", "board")
 
 
 # GoalComment
@@ -128,10 +124,11 @@ class GoalCommentSerializer(serializers.ModelSerializer):
     пользователю используется сериализатор Пользователя, убрана логика с подстановкой текущего пользователя в поле user.
     """
     user = UserProfileSerializer(read_only=True)
-    goal = serializers.SerializerMethodField()
 
-    def get_goal(self, goalcomment):
-        return goalcomment.goal.title
+    # goal = serializers.SerializerMethodField()
+    #
+    # def get_goal(self, goalcomment):
+    #     return goalcomment.goal.title
 
     class Meta:
         model = GoalComment
@@ -186,10 +183,10 @@ class GoalSerializer(serializers.ModelSerializer):
     умолчанию. Проверка по дате дедлайна не позволяет указывать дату в прошлом в качестве дедлайна для цели.
     """
     user = UserProfileSerializer(read_only=True)
-    goalcomment = serializers.SerializerMethodField()
-
-    def get_goalcomment(self, goal):
-        return [item.text for item in goal.goal_comment.all()]
+    # goalcomment = serializers.SerializerMethodField()
+    #
+    # def get_goalcomment(self, goal):
+    #     return [item.text for item in goal.goal_comment.all()]
 
     class Meta:
         model = Goal
