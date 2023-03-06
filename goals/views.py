@@ -92,13 +92,11 @@ class GoalListView(ListAPIView):
 
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
     filterset_class = GoalDateFilter
-    ordering_fields = ["priority", "due_date"]
-    ordering = ["due_date", "priority"]
+    ordering_fields = ["title", "created"]
+    ordering = ["title"]
     search_fields = ["title", "description"]
 
     def get_queryset(self):
-        # пользователь видит созданные пользователем актуальные цели, а также цели с актуальными категориями,
-        # в досках которых он является участником
         return Goal.objects.filter(category__board__participants__user=self.request.user,
                                    category__is_deleted=False).exclude(status=Goal.Status.archived)
 
@@ -149,11 +147,9 @@ class GoalCommentListView(ListAPIView):
     serializer_class = GoalCommentSerializer
     pagination_class = LimitOffsetPagination
 
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['goal']
-    ordering_fields = ["created"]
-    ordering = ["text"]
-    search_fields = ["text"]
+    ordering = ["-created"]
 
     def get_queryset(self):
         return GoalComment.objects.filter(goal__category__board__participants__user=self.request.user)
@@ -221,11 +217,9 @@ class BoardView(RetrieveUpdateDestroyAPIView):
     serializer_class = BoardSerializer
 
     def get_queryset(self):
-        #
         return Board.objects.filter(participants__user=self.request.user, is_deleted=False)
 
     def perform_destroy(self, instance: Board):
-        #
         with transaction.atomic():
             instance.is_deleted = True
             instance.save()
