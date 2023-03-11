@@ -21,7 +21,7 @@ services:
 
 
   frontend:
-    image: sermalenk/skypro-front:lesson-37
+    image: sermalenk/skypro-front:lesson-38
     ports:
       - "80:80"
     volumes:
@@ -45,7 +45,9 @@ services:
       - django_static:/opt/static/
       - ./core:/opt/core
       - ./goals:/opt/goals
+      - ./bot:/opt/bot
     command: python3 manage.py collectstatic -c --no-input
+
 
   api:
     build:
@@ -59,12 +61,32 @@ services:
       - ./todolist:/opt/todolist
       - ./core:/opt/core
       - ./goals:/opt/goals
+      - ./bot:/opt/bot
     ports:
       - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
     restart: always
+
+
+  bot:
+    build:
+      context: .
+      target: dev_image
+    env_file: .env
+    volumes:
+      - ./bot:/opt/bot
+      - ./core:/opt/core
+      - ./goals:/opt/goals
+      - ./todolist:/opt/todolist
+    depends_on:
+      db:
+        condition: service_healthy
+      api:
+        condition: service_started
+    restart: always
+    command: python3 manage.py runbot
 
 
 volumes:
