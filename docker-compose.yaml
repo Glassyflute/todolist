@@ -70,24 +70,51 @@ services:
     restart: always
 
 
-  bot:
-    build:
-      context: .
-      target: dev_image
-    env_file: .env
-    volumes:
-      - ./bot:/opt/bot
-      - ./core:/opt/core
-      - ./goals:/opt/goals
-      - ./todolist:/opt/todolist
-    depends_on:
-      db:
-        condition: service_healthy
-      api:
-        condition: service_started
-    restart: always
-    command: python3 manage.py runbot
+#  bot:
+#    build:
+#      context: .
+#      target: dev_image
+#    env_file: .env
+#    volumes:
+#      - ./bot:/opt/bot
+##      - ./bot:/opt/bot/storage
+##      - ./bot/logs:/opt/bot/logs
+#      - ./core:/opt/core
+#      - ./goals:/opt/goals
+#      - ./todolist:/opt/todolist
+##      - diploma_postgres_data:/var/lib/postgresql/data
+##      - ./manage.py:/opt
+#    depends_on:
+#      db:
+#        condition: service_healthy
+#      api:
+#        condition: service_started
+#    restart: always
+#    command: python3 manage.py runbot
 
+#    command: python3 opt/bot/runbot.py
+#
+#
+#  bot:
+#    build:
+#      context: .
+#      target: prod_image
+#    env_file: .env
+#    volumes:
+#      - ./bot:/opt/bot
+##      - ./bot:/opt/bot/storage
+##      - ./bot/logs:/opt/bot/logs
+##      - ./core:/opt/core
+##      - ./goals:/opt/goals
+##      - ./todolist:/opt/todolist
+#    depends_on:
+#      db:
+#        condition: service_healthy
+#      api:
+#        condition: service_started
+#    restart: always
+#    command: python3 manage.py runbot
+##    command: python3 opt/bot/runbot.py
 
 volumes:
   diploma_postgres_data:
