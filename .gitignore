@@ -162,3 +162,4 @@ cython_debug/
 /additional.py
 /static
 /goals/guide_migrations.py
+/workfile_bot.py
