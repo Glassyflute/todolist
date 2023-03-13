@@ -1,7 +1,7 @@
 from django.db import models
 
 from core.models import User
-from goals.models import Goal
+from goals.models import Goal, GoalCategory
 
 
 class TgUser(models.Model):
@@ -22,6 +22,14 @@ class TgUser(models.Model):
         user_goals = Goal.objects.filter(category__board__participants__user=self.user,
                                          category__is_deleted=False).exclude(status=Goal.Status.archived)
         return user_goals
+
+    def show_user_goal_categories(self):
+        user_categories = GoalCategory.objects.filter(board__participants__user=self.user, is_deleted=False)
+        return user_categories
+
+    # def create_goal_via_tg(self, category, goal):
+    #     prelim_dict = {"category": category, "goal": goal}
+    #     return prelim_dict
 
     def assign_verification_code(self) -> str:
         verification_code = self._generate_verification_code()
