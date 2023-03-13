@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand
 from bot.models import TgUser
 from bot.tg.client import TgClient
 from bot.tg.dc import Message
+from goals.models import Goal
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +41,9 @@ class Command(BaseCommand):
 
         if tg_user.user:
             self.handle_authorized_user(tg_user=tg_user, message=message)
+            # # /goals here
+            # self.tg_client.get_send_message(chat_id=msg_chat_id, text="goals 0")
+            # self.handle_goals(tg_user=tg_user, message=message)
         else:
             self.handle_unauthorized_user(tg_user=tg_user, message=message)
 
@@ -71,7 +75,41 @@ class Command(BaseCommand):
         msg_auth_greeting = f"Welcome to chat, {tg_username}"
         self.tg_client.get_send_message(chat_id=msg_chat_id, text=msg_auth_greeting)
 
+        self.tg_client.get_send_message(chat_id=msg_chat_id, text="Выберите действие")
 
-
+        self.handle_goals(tg_user=tg_user, message=message)
 
     # for /start, /help === show original greeting message or list of functions
+
+    def handle_goals(self, tg_user: TgUser, message: Message):
+        msg_text = message["text"]
+        msg_chat_id = message["chat"]["id"]
+        self.tg_client.get_send_message(chat_id=msg_chat_id, text="goals p1")
+
+        if "/goals" in msg_text:
+            self.tg_client.get_send_message(chat_id=msg_chat_id, text="goals 2 - asked")
+            goals_data = self.handle_db_goals(tg_user=tg_user)
+            self.tg_client.get_send_message(chat_id=msg_chat_id, text="goals 3 - данные загружены")
+
+            for goal_item in goals_data:
+                self.tg_client.get_send_message(chat_id=msg_chat_id, text=goal_item)
+
+            self.tg_client.get_send_message(chat_id=msg_chat_id, text="goals 4 - показ данных завершен")
+        else:
+            self.tg_client.get_send_message(chat_id=msg_chat_id, text="Неизвестная команда")
+
+    def handle_db_goals(self, tg_user: TgUser):
+        user_goals = tg_user.show_user_goals()
+
+        goals_titles = []
+        for goal_item in user_goals:
+            goals_titles.append(goal_item.title)
+
+        len_goals = len(user_goals)
+
+        print(f" Goal titles: {goals_titles}")
+        print(f"Number of goals: {len_goals}")
+
+        return goals_titles
+
+
