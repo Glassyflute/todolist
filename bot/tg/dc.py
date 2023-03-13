@@ -96,7 +96,7 @@ class GetUpdatesResponse:
 @dataclass
 class SendMessageResponse:
     ok: bool
-    # result: Message  
+    # result: Message
     result: MessageObj
 
     class Meta:
