@@ -93,7 +93,6 @@ class Command(BaseCommand):
         elif "/create" in msg_text:
             self.tg_client.get_send_message(chat_id=msg_chat_id, text="Список ваших категорий ниже.")
             goal_categories_data = self.handle_db_categories(tg_user=tg_user)
-            # self.tg_client.get_send_message(chat_id=msg_chat_id, text="категории загружены 1")
             for category_item in goal_categories_data:
                 self.tg_client.get_send_message(chat_id=msg_chat_id, text=category_item)
             self.tg_client.get_send_message(chat_id=msg_chat_id, text="Выберите категорию для новой цели.")
@@ -154,9 +153,6 @@ class Command(BaseCommand):
         for category_item in user_categories:
             categories_titles.append(category_item.title)
 
-        # len_categories = len(categories_titles)
-        # print(f" Categories: {categories_titles}")
-        # print(f"Number of categories: {len_categories}")
         return categories_titles
 
     def handle_db_goals(self, tg_user: TgUser):
@@ -166,9 +162,6 @@ class Command(BaseCommand):
         for goal_item in user_goals:
             goals_titles.append(goal_item.title)
 
-        # len_goals = len(user_goals)
-        # print(f" Goal titles: {goals_titles}")
-        # print(f"Number of goals: {len_goals}")
         return goals_titles
 
     # def handle_save_category(self, tg_user: TgUser, message: Message):
