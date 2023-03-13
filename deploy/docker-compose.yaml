@@ -52,6 +52,21 @@ services:
     restart: always
 
 
+  bot:
+    build:
+      context: .
+      target: prod_image
+    env_file: .env
+    environment:
+      POSTGRES_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
+      api:
+        condition: service_started
+    restart: always
+    command: python3 manage.py runbot
+
 volumes:
   diploma_postgres_data:
   django_static:
