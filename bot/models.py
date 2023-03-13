@@ -1,6 +1,7 @@
 from django.db import models
 
 from core.models import User
+from goals.models import Goal
 
 
 class TgUser(models.Model):
@@ -16,6 +17,11 @@ class TgUser(models.Model):
     def _generate_verification_code() -> str:
         code = User.objects.make_random_password(length=50, allowed_chars="abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789")
         return code
+
+    def show_user_goals(self):
+        user_goals = Goal.objects.filter(category__board__participants__user=self.user,
+                                         category__is_deleted=False).exclude(status=Goal.Status.archived)
+        return user_goals
 
     def assign_verification_code(self) -> str:
         verification_code = self._generate_verification_code()
