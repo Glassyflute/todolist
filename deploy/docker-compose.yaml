@@ -53,9 +53,7 @@ services:
 
 
   bot:
-    build:
-      context: .
-      target: prod_image
+    image: azulien/todolist:latest
     env_file: .env
     environment:
       POSTGRES_HOST: db

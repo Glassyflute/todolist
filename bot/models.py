@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.crypto import get_random_string
 
 from core.models import User
 from goals.models import Goal, GoalCategory
@@ -15,7 +16,8 @@ class TgUser(models.Model):
 
     @staticmethod
     def _generate_verification_code() -> str:
-        code = User.objects.make_random_password(length=50, allowed_chars="abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789")
+        # code = User.objects.make_random_password(length=50, allowed_chars="abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789")
+        code = get_random_string(length=50, allowed_chars="abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789")
         return code
 
     def show_user_goals(self):
@@ -48,5 +50,5 @@ class TgUser(models.Model):
         ordering = ["-id"]
 
     def __str__(self):
-        return f"<Чат id: {self.tg_chat_id}>, id пользователя в Телеграм: {self.tg_user_id}"
+        return f"Чат id: {self.tg_chat_id}, username пользователя в Телеграм: {self.tg_username}"
 
