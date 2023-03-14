@@ -29,10 +29,6 @@ class TgUser(models.Model):
         user_categories = GoalCategory.objects.filter(board__participants__user=self.user, is_deleted=False)
         return user_categories
 
-    # def create_goal_via_tg(self, category, goal):
-    #     prelim_dict = {"category": category, "goal": goal}
-    #     return prelim_dict
-
     def assign_verification_code(self) -> str:
         verification_code = self._generate_verification_code()
         self.verification_code = verification_code
