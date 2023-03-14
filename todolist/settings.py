@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django_filters',
     'core',
     'goals',
+    'bot',
 ]
 
 MIDDLEWARE = [
@@ -162,3 +163,33 @@ SOCIAL_AUTH_VK_EXTRA_DATA = [
 ]
 SOCIAL_AUTH_NEW_USER_REDIRECT_URL = '/logged-in/'
 SOCIAL_AUTH_USER_MODEL = 'core.User'
+
+BOT_TELEGRAM_TOKEN = env.str('BOT_TELEGRAM_TOKEN')
+
+
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
+            'format': '%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(message)s',
+        }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console',
+        },
+        'null': {'class': 'logging.NullHandler'},
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+        },
+        'django.server': {
+            'handlers': ['null'],
+        },
+    }
+}

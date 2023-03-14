@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 
 
-class GoalsConfig(AppConfig):
+class BotConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'goals'
-    verbose_name = 'Цели'
+    name = 'bot'
+    verbose_name = 'Бот'

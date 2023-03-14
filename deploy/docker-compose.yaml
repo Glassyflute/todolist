@@ -19,7 +19,7 @@ services:
 
 
   frontend:
-    image: sermalenk/skypro-front:lesson-37
+    image: sermalenk/skypro-front:lesson-38
     ports:
       - "80:80"
     volumes:
@@ -51,6 +51,19 @@ services:
         condition: service_healthy
     restart: always
 
+
+  bot:
+    image: azulien/todolist:latest
+    env_file: .env
+    environment:
+      POSTGRES_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
+      api:
+        condition: service_started
+    restart: always
+    command: python3 manage.py runbot
 
 volumes:
   diploma_postgres_data:
