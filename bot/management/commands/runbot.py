@@ -5,14 +5,12 @@ from django.core.management.base import BaseCommand
 from bot.models import TgUser
 from bot.tg.client import TgClient
 from bot.tg.dc import Message
-from goals.models import Goal, GoalCategory
+from goals.models import Goal
 
 logger = logging.getLogger(__name__)
 
 
 USER_NOT_IN_DB = "User is not authorized. Bot needs to generate Verification code and send to user."
-# logger.info("User is not authorized. Bot needs to generate Verification code and send to user. %s", "user_not_in_db")
-
 USER_IN_DB_NOT_AUTHORIZED = "User is in database but is not authorized. Bot provided verification code to user and " \
                             "expects the user to link the Telegram user with DB user data via the Todolist" \
                             " web application."
@@ -22,10 +20,11 @@ GREETING_UNAUTH_USER = f"Greetings, User. Please, verify your account. For prope
 USER_IS_AUTHORIZED = "User is authorized."
 
 BOT_SENDS_ALL_GOAL_TITLES = "Bot successfully sent the list of goal titles to the User."
-USER_CANCELLED_OPERATION = "User cancelled the operation by sending /cancel command to bot."
 BOT_SENDS_ALL_CATEGORIES_TITLES = "Bot successfully sent all titles for goal categories to user and asked User " \
                                   "to proceed with selecting a category."
+USER_CANCELLED_OPERATION = "User cancelled the operation by sending /cancel command to bot."
 BOT_RECEIVED_UNKNOWN_COMMAND = "Bot received an unknown command from User. No actions performed."
+
 USER_INITIATED_GOAL_CREATION = "Bot received /create command from User to proceed with creation of a new goal."
 BOT_AWAITING_CATEGORY = "Bot expects category name from User from the list of available categories."
 USER_SELECTED_CATEGORY = "User successfully selected a category for the goal from the list of available categories."
@@ -34,11 +33,12 @@ BOT_SAVED_CATEGORY = "Bot saved the selected category as first step in goal crea
 BOT_AWAITING_GOAL_TITLE = "Bot expects goal title from User."
 USER_SELECTED_GOAL_TITLE = "User provided goal title to bot."
 BOT_SAVED_GOAL_TITLE = "Bot saved the goal title as part of goal creation process."
-
 BOT_CREATED_NEW_GOAL = "Bot created the goal and saved goal data in the database. Bot provided link to Web " \
                        "app to User."
+BOT_CLEARED_DATA = "Bot cleared all data in user_states upon creating the goal."
 
-user_states: dict[str, dict] = {"327134280": {}}
+
+user_states: dict[str, dict] = {"state": {}}
 
 
 class Command(BaseCommand):
@@ -71,8 +71,7 @@ class Command(BaseCommand):
         tg_username = message["chat"]["username"]
 
         tg_user, created = TgUser.objects.get_or_create(tg_chat_id=msg_chat_id)
-        logger.info(f"Created: {created} for tg_chat_id <{msg_chat_id}>")
-        # logger.info("Created: %s" "for tg_chat_id %s", created, msg_chat_id)
+        logger.info("Created: %s" " for tg_chat_id %s", created, msg_chat_id)
 
         if tg_user.user:
             self.handle_authorized_user(tg_user=tg_user, message=message)
@@ -116,14 +115,21 @@ class Command(BaseCommand):
             logger.info(BOT_SENDS_ALL_GOAL_TITLES)
 
         elif "/cancel" in msg_text:
-            if "user" in user_states["327134280"]:
-                del user_states["327134280"]["user"]
+            if "user" in user_states["state"]:
+                del user_states["state"]["user"]
+                del user_states["state"]["msg_chat_id"]
+                if "category" in user_states["state"]:
+                    del user_states["state"]["category"]
+                if "goal_title" in user_states["state"]:
+                    del user_states["state"]["goal_title"]
             self.tg_client.get_send_message(chat_id=msg_chat_id, text="Операция отменена")
             logger.info(USER_CANCELLED_OPERATION)
+            logger.info("user_states is %s", user_states)
 
-        elif ("user" not in user_states["327134280"]) and (msg_text not in allowed_commands):
+        elif ("user" not in user_states["state"]) and (msg_text not in allowed_commands):
             self.tg_client.get_send_message(chat_id=msg_chat_id, text="Неизвестная команда")
             logger.info(BOT_RECEIVED_UNKNOWN_COMMAND)
+            logger.info("user_states is %s", user_states)
 
         elif "/create" in msg_text:
             logger.info(USER_INITIATED_GOAL_CREATION)
@@ -131,49 +137,57 @@ class Command(BaseCommand):
 
             goal_categories_data = self.handle_db_categories(tg_user=tg_user)
             for category_item in goal_categories_data:
-                self.tg_client.get_send_message(chat_id=msg_chat_id, text=category_item)
+                category_ = f"{category_item[0]} - {category_item[1]}"
+                self.tg_client.get_send_message(chat_id=msg_chat_id, text=category_)
             self.tg_client.get_send_message(chat_id=msg_chat_id, text="Выберите категорию для новой цели.")
             logger.info(BOT_SENDS_ALL_CATEGORIES_TITLES)
 
-            if "user" not in user_states["327134280"]:
-                user_states["327134280"]["user"] = tg_user.user
+            if "user" not in user_states["state"]:
+                user_states["state"]["user"] = tg_user.user
+                user_states["state"]["msg_chat_id"] = msg_chat_id
                 logger.info("user_states is %s", user_states)
                 logger.info("User assigned to dict")
                 logger.info(BOT_AWAITING_CATEGORY)
 
-        elif (msg_text not in allowed_commands) and (user_states["327134280"]["user"]) and \
-                ("category" not in user_states["327134280"]):
+        elif (msg_text not in allowed_commands) and (user_states["state"]["user"]) and \
+                ("category" not in user_states["state"]):
             category = self.handle_save_category(tg_user=tg_user, message=message)
             if category:
-                user_states["327134280"]["category"] = category
+                user_states["state"]["category"] = category
                 logger.info("user_states is %s", user_states)
                 logger.info(BOT_SAVED_CATEGORY)
                 logger.info(BOT_AWAITING_GOAL_TITLE)
                 self.tg_client.get_send_message(chat_id=msg_chat_id, text="Категория выбрана. Введите заголовок цели.")
 
-        elif (msg_text not in allowed_commands) and (user_states["327134280"]["user"]) and \
-                (user_states["327134280"]["category"]) and ("goal_title" not in user_states["327134280"]):
-            user_states["327134280"]["goal_title"] = msg_text
+        elif (msg_text not in allowed_commands) and (user_states["state"]["user"]) and \
+                (user_states["state"]["category"]) and ("goal_title" not in user_states["state"]):
+            user_states["state"]["goal_title"] = msg_text
             logger.info("user_states is %s", user_states)
             logger.info(BOT_SAVED_GOAL_TITLE)
 
-            goal = Goal.objects.create(title=user_states["327134280"]["goal_title"],
-                                       user=user_states["327134280"]["user"],
-                                       category=user_states["327134280"]["category"])
+            goal = Goal.objects.create(title=user_states["state"]["goal_title"],
+                                       user=user_states["state"]["user"],
+                                       category=user_states["state"]["category"])
             self.tg_client.get_send_message(chat_id=msg_chat_id,
                                             text="Цель создана в БД. Ссылка на приложение: http://127.0.0.1")
             logger.info(BOT_CREATED_NEW_GOAL)
+            del user_states["state"]["user"]
+            del user_states["state"]["msg_chat_id"]
+            del user_states["state"]["category"]
+            del user_states["state"]["goal_title"]
+            logger.info(BOT_CLEARED_DATA)
 
     def handle_save_category(self, tg_user: TgUser, message: Message):
         msg_text = message["text"]
         msg_chat_id = message["chat"]["id"]
 
         goal_categories_data = self.handle_db_categories(tg_user=tg_user)
-        if msg_text in goal_categories_data:
-            category_name = msg_text
-            user_categories = tg_user.show_user_goal_categories()
-            category_data = user_categories.get(title=category_name)
-            return category_data
+        user_categories = tg_user.show_user_goal_categories()
+        for item in goal_categories_data:
+            if msg_text in str(item[0]):
+                category_id = msg_text
+                category_data = user_categories.get(pk=category_id)
+                return category_data
 
         self.tg_client.get_send_message(chat_id=msg_chat_id, text="Ошибка. Введите корректную категорию.")
 
@@ -185,18 +199,16 @@ class Command(BaseCommand):
 
         for goal_item in goals_data:
             self.tg_client.get_send_message(chat_id=msg_chat_id, text=goal_item)
-
         self.tg_client.get_send_message(chat_id=msg_chat_id,
                                         text="Для создания новой цели, используйте команду /create")
 
     def handle_db_categories(self, tg_user: TgUser):
         user_categories = tg_user.show_user_goal_categories()
 
-        categories_titles = []
+        categories_data_list = []
         for category_item in user_categories:
-            categories_titles.append(category_item.title)
-
-        return categories_titles
+            categories_data_list.append([category_item.id, category_item.title])
+        return categories_data_list
 
     def handle_db_goals(self, tg_user: TgUser):
         user_goals = tg_user.show_user_goals()
@@ -204,5 +216,4 @@ class Command(BaseCommand):
         goals_titles = []
         for goal_item in user_goals:
             goals_titles.append(goal_item.title)
-
         return goals_titles

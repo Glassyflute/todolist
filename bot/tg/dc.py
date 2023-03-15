@@ -1,8 +1,10 @@
 from dataclasses import dataclass, field
+
 from typing import List, Optional
 
 import marshmallow
 import marshmallow_dataclass
+
 
 # {"ok":true,
 #  "result":
@@ -53,6 +55,9 @@ class Message:
     from_: MessageFrom
     chat: Chat
     text: Optional[str]
+
+    def __getitem__(self, item):
+        return self.item
 
 
 @dataclass
