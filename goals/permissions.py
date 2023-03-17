@@ -7,7 +7,7 @@ class BoardPermissions(permissions.IsAuthenticated):
     """
     Наследование от permissions.IsAuthenticated позволяет проверить, что пользователь аутентифицирован. Класс добавляет
     фильтр по разрешенным ролям пользователя, если request.method не равен GET.
-    Менять/удалять доску имеет право только создатель доски.
+    Изменять/удалять доску имеет право только создатель доски.
     """
     def has_object_permission(self, request, view, obj: Board):
         _filters: dict = {"user": request.user, "board": obj}

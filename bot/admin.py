@@ -6,7 +6,7 @@ from bot.models import TgUser
 class TgUserAdmin(admin.ModelAdmin):
     """
     Админка для модели пользователя Телеграм (TgUser) позволяет поиск по username для пользователя Телеграм или username
-    для пользователя в БД. Есть возможность фильтровать данные по username для пользователя Телеграм.
+    для пользователя в БД. Есть возможность фильтровать данные по username и tg_chat_id для пользователя Телеграм.
     """
     list_display = ("tg_chat_id", "tg_username", "verification_code")
     search_fields = ("tg_username", "user__username")
