@@ -1,4 +1,3 @@
-# собираем image для локальной разработки (todolist в django)
 FROM python:3.10.9-slim as base_image
 
 # пробрасываем переменные окружения и сразу устанавливаем Poetry
