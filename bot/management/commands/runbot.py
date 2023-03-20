@@ -8,7 +8,7 @@ from bot.tg.dc import Message
 from goals.models import Goal
 
 logger = logging.getLogger(__name__)
-
+# logging.basicConfig(filename='bot.log', encoding='utf-8', level=logging.INFO)
 
 USER_NOT_IN_DB = "User is not authorized. Bot needs to generate Verification code and send to user."
 USER_IN_DB_NOT_AUTHORIZED = "User is in database but is not authorized. Bot provided verification code to user and " \

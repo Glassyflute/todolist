@@ -16,7 +16,6 @@ class TgUser(models.Model):
 
     @staticmethod
     def _generate_verification_code() -> str:
-        # code = User.objects.make_random_password(length=50, allowed_chars="abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789")
         code = get_random_string(length=50, allowed_chars="abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789")
         return code
 
