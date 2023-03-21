@@ -1,8 +1,8 @@
-from core.models import User
-
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
+
+from core.models import User
 
 
 class UserTest(APITestCase):
@@ -26,9 +26,9 @@ class UserTest(APITestCase):
 
         url = reverse("login")
         data = {"username": "test_username", "password": "test_password"}
-        response = self.client.post(url, data, format='json')
+        res = self.client.post(url, data, format='json')
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)     # 200 != 403
+        self.assertEqual(res.status_code, status.HTTP_200_OK)     # 200 != 403
         self.assertEqual(User.objects.filter(username=data["username"]).count(), 1)
 
     def test_show_user_profile(self):
@@ -38,7 +38,7 @@ class UserTest(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        user_obj = User.objects.get(username=self.user.username)
+        user_obj = User.objects.get(pk=self.user.pk)
         self.assertEqual(user_obj.username, "Dianerys")
         self.assertNotEqual(user_obj.username, self.superuser.username)
 
@@ -50,9 +50,9 @@ class UserTest(APITestCase):
         response = self.client.put(url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(User.objects.filter(username=self.user.username).count(), 1)
+        self.assertEqual(User.objects.filter(pk=self.user.pk).count(), 1)
 
-        user_obj = User.objects.get(username=self.user.username)
+        user_obj = User.objects.get(pk=self.user.pk)
         self.assertEqual(user_obj.first_name, data["first_name"])
         self.assertEqual(user_obj.last_name, data["last_name"])
         self.assertEqual(user_obj.email, data["email"])
@@ -66,9 +66,9 @@ class UserTest(APITestCase):
         response = self.client.patch(url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(User.objects.filter(username=self.user.username).count(), 1)
+        self.assertEqual(User.objects.filter(pk=self.user.pk).count(), 1)
 
-        user_obj = User.objects.get(username=self.user.username)
+        user_obj = User.objects.get(pk=self.user.pk)
         self.assertEqual(user_obj.first_name, data["first_name"])
         self.assertEqual(user_obj.email, data["email"])
         self.assertEqual(user_obj.username, "Dianerys")
@@ -82,7 +82,13 @@ class UserTest(APITestCase):
         response = self.client.delete(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(User.objects.filter(username=self.user.username).count(), 1)
+
+        # Пользователь остается в БД (согласно требованиям ТЗ), но становится неавторизованным
+        self.assertEqual(User.objects.filter(pk=self.user.pk).count(), 1)
+
+        url = reverse("profile")
+        res_logout = self.client.get(url, format='json')
+        self.assertEqual(res_logout.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_change_password(self):
         self.client.force_login(self.user)
@@ -93,7 +99,7 @@ class UserTest(APITestCase):
 
         # self.user.set_password(data["new_password"])
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(User.objects.filter(username=self.user.username).count(), 1)
+        self.assertEqual(User.objects.filter(pk=self.user.pk).count(), 1)
 
-        # user_obj = User.objects.get(username=self.user.username)
+        # user_obj = User.objects.get(pk=self.user.pk)
         # self.assertEqual(user_obj.password, self.user.password)
