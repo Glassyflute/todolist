@@ -61,11 +61,11 @@ class BoardTest(APITestCase):
         response = self.client.post(url, data, format='json')
 
         url_detailed = reverse("board-detail", kwargs={"pk": response.data["id"]})
-        data_upd = {"title": "board_updated_title"}
-        res = self.client.patch(url_detailed, data_upd, format='json')
+        data = {"title": "board_updated_title"}
+        res = self.client.patch(url_detailed, data, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(Board.objects.filter(title=data_upd["title"]).count(), 1)
+        self.assertEqual(Board.objects.filter(title=data["title"]).count(), 1)
 
         board_obj = Board.objects.get(pk=response.data["id"])
         self.assertEqual(board_obj.title, res.data["title"])
