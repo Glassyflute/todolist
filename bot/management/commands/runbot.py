@@ -8,21 +8,21 @@ from bot.tg.dc import Message
 from goals.models import Goal
 
 logger = logging.getLogger(__name__)
-# logging.basicConfig(filename='bot.log', encoding='utf-8', level=logging.INFO)
+# logging.basicConfig(filename='bot_testing.log', encoding='utf-8', level=logging.INFO)
 
 USER_NOT_IN_DB = "User is not authorized. Bot needs to generate Verification code and send to user."
 USER_IN_DB_NOT_AUTHORIZED = "User is in database but is not authorized. Bot provided verification code to user and " \
                             "expects the user to link the Telegram user with DB user data via the Todolist" \
                             " web application."
 GREETING_UNAUTH_USER = f"Greetings, User. Please, verify your account. For proper authorization " \
-                         "insert the verification code provided by the Telegram bot into the application " \
+                         "insert the verification code provided by the Telegram bot_testing into the application " \
                          "while being logged in."
 USER_IS_AUTHORIZED = "User is authorized."
 
 BOT_SENDS_ALL_GOAL_TITLES = "Bot successfully sent the list of goal titles to the User."
 BOT_SENDS_ALL_CATEGORIES_TITLES = "Bot successfully sent all titles for goal categories to user and asked User " \
                                   "to proceed with selecting a category."
-USER_CANCELLED_OPERATION = "User cancelled the operation by sending /cancel command to bot."
+USER_CANCELLED_OPERATION = "User cancelled the operation by sending /cancel command to bot_testing."
 BOT_RECEIVED_UNKNOWN_COMMAND = "Bot received an unknown command from User. No actions performed."
 
 USER_INITIATED_GOAL_CREATION = "Bot received /create command from User to proceed with creation of a new goal."
@@ -31,7 +31,7 @@ USER_SELECTED_CATEGORY = "User successfully selected a category for the goal fro
 BOT_SAVED_CATEGORY = "Bot saved the selected category as first step in goal creation process."
 
 BOT_AWAITING_GOAL_TITLE = "Bot expects goal title from User."
-USER_SELECTED_GOAL_TITLE = "User provided goal title to bot."
+USER_SELECTED_GOAL_TITLE = "User provided goal title to bot_testing."
 BOT_SAVED_GOAL_TITLE = "Bot saved the goal title as part of goal creation process."
 BOT_CREATED_NEW_GOAL = "Bot created the goal and saved goal data in the database. Bot provided link to Web " \
                        "app to User."

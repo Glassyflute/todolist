@@ -45,7 +45,7 @@ services:
       - django_static:/opt/static/
       - ./core:/opt/core
       - ./goals:/opt/goals
-      - ./bot:/opt/bot
+      - ./bot_testing:/opt/bot_testing
     command: python3 manage.py collectstatic -c --no-input
 
 
@@ -61,7 +61,7 @@ services:
       - ./todolist:/opt/todolist
       - ./core:/opt/core
       - ./goals:/opt/goals
-      - ./bot:/opt/bot
+      - ./bot_testing:/opt/bot_testing
     ports:
       - "8000:8000"
     depends_on:
@@ -78,7 +78,7 @@ services:
     environment:
       POSTGRES_HOST: db
     volumes:
-      - ./bot:/opt/bot
+      - ./bot_testing:/opt/bot_testing
       - ./core:/opt/core
       - ./goals:/opt/goals
       - ./todolist:/opt/todolist
