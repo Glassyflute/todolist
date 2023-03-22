@@ -27,6 +27,16 @@ class HelpfulTest(APITestCase):
 
 
 class GoalCategoryTest(HelpfulTest):
+    def test_category_create(self):
+        response_board = self.create_board()
+
+        url = reverse("category-create")
+        data = {"title": "new_category_title", "board": response_board.data["id"]}
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(GoalCategory.objects.filter(title=data["title"]).count(), 1)
+
     def test_category_get_list(self):
         response_board = self.create_board()
         board_dict = response_board.data
@@ -112,6 +122,7 @@ class GoalCategoryTest(HelpfulTest):
         res = self.client.delete(url_detailed, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        # Категория остается в БД (согласно требованиям ТЗ)
         self.assertEqual(GoalCategory.objects.filter(pk=response_cat.data["id"]).count(), 1)
 
     def test_category_delete_for_db_category(self):
@@ -121,14 +132,5 @@ class GoalCategoryTest(HelpfulTest):
         res = self.client.delete(url_detailed, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        # Категория остается в БД (согласно требованиям ТЗ)
         self.assertEqual(GoalCategory.objects.filter(pk=category.pk).count(), 1)
-
-    def test_category_create(self):
-        response_board = self.create_board()
-
-        url = reverse("category-create")
-        data = {"title": "new_category_title", "board": response_board.data["id"]}
-        response = self.client.post(url, data, format='json')
-
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(GoalCategory.objects.filter(title=data["title"]).count(), 1)

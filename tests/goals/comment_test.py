@@ -106,4 +106,5 @@ class CommentTest(HelpfulTest):
         res = self.client.delete(url_detailed, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        # Комментарий удаляется из БД (согласно требованиям ТЗ)
         self.assertEqual(GoalComment.objects.filter(pk=response_comment.data["id"]).count(), 0)

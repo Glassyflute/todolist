@@ -81,7 +81,6 @@ class GoalTest(HelpfulTest):
         url_detailed = reverse("goal-detail", kwargs={"pk": response_goal.data["id"]})
         data = {"title": "goal_updated_title"}
         res = self.client.patch(url_detailed, data, format='json')
-        # res = self.client.put(url_detailed, data, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(Goal.objects.filter(pk=response_goal.data["id"]).count(), 1)
@@ -122,4 +121,5 @@ class GoalTest(HelpfulTest):
         res = self.client.delete(url_detailed, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        # Цель остается в БД (согласно требованиям ТЗ)
         self.assertEqual(Goal.objects.filter(pk=response_goal.data["id"]).count(), 1)

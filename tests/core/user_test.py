@@ -80,7 +80,6 @@ class UserTest(APITestCase):
 
         url = reverse("profile")
         response = self.client.delete(url, format='json')
-
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         # Пользователь остается в БД (согласно требованиям ТЗ), но становится неавторизованным

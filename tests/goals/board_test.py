@@ -79,4 +79,5 @@ class BoardTest(APITestCase):
         res = self.client.delete(url_detailed, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        # Доска остается в БД (согласно требованиям ТЗ)
         self.assertEqual(Board.objects.filter(title=data["title"]).count(), 1)
