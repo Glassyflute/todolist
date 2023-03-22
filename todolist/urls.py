@@ -22,7 +22,7 @@ urlpatterns = [
     path("oauth/", include("social_django.urls", namespace="social")),
     path("core/", include("core.urls"), name="core"),
     path("goals/", include("goals.urls"), name="goals"),
-    path("bot_testing/", include("bot_testing.urls"), name="bot_testing"),
+    path("bot/", include("bot.urls"), name="bot"),
 ]
 
 if settings.DEBUG:
