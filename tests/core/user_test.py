@@ -91,14 +91,15 @@ class UserTest(APITestCase):
 
     def test_change_password(self):
         self.client.force_login(self.user)
-
         url = reverse("update_password")
         data = {"old_password": "Dian_password", "new_password": "updated_password_new"}
         response = self.client.put(url, data, format='json')
 
-        # self.user.set_password(data["new_password"])
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(User.objects.filter(pk=self.user.pk).count(), 1)
 
-        # user_obj = User.objects.get(pk=self.user.pk)
-        # self.assertEqual(user_obj.password, self.user.password)
+        self.client.logout()
+        url = reverse("login")
+        data = {"username": self.user.username, "password": "updated_password_new"}
+        res = self.client.post(url, data, format='json')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
