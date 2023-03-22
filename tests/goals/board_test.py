@@ -8,7 +8,6 @@ from goals.models import Board, BoardParticipant
 
 class BoardTest(APITestCase):
     def setUp(self):
-        self.board = Board.objects.create(title="Board_one")
         self.user = User.objects.create_user(username="Dianerys", email="dian@mail.ru", password="Dian_password")
         self.client.force_login(self.user)
 
@@ -32,6 +31,7 @@ class BoardTest(APITestCase):
         self.assertIn(board_participant, BoardParticipant.objects.all())
 
     def test_board_get_list(self):
+        board_one = Board.objects.create(title="Board_one")
         board_two = Board.objects.create(title="Board_two")
 
         url = reverse("board-list")
