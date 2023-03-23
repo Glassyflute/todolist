@@ -10,6 +10,10 @@ from goals.models import GoalCategory, Goal, GoalComment, Board, BoardParticipan
 
 # Board
 class BoardParticipantSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для модели BoardParticipant, выводит информацию по парам значений для пользователя и доски, а также
+    роли пользователя в этой доске.
+    """
     role = serializers.ChoiceField(required=True, choices=BoardParticipant.Role.choices[1:])
     user = serializers.SlugRelatedField(slug_field="username", queryset=User.objects.all())
 
@@ -20,6 +24,9 @@ class BoardParticipantSerializer(serializers.ModelSerializer):
 
 
 class BoardCreateSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для создания доски. При создании доски требуется указать название доски.
+    """
     class Meta:
         model = Board
         read_only_fields = ("id", "created", "updated", "is_deleted")
@@ -27,6 +34,9 @@ class BoardCreateSerializer(serializers.ModelSerializer):
 
 
 class BoardListSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для вывода списка досок пользователя.
+    """
     class Meta:
         model = Board
         read_only_fields = ("id", "created", "updated", "is_deleted")
@@ -34,6 +44,10 @@ class BoardListSerializer(serializers.ModelSerializer):
 
 
 class BoardSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для вывода детальной информации по доске, включает дополнительно информацию по полю participants на
+    основе BoardParticipantSerializer, которая показывает участников доски с их ролями в доске.
+    """
     participants = BoardParticipantSerializer(many=True)
 
     class Meta:
@@ -125,6 +139,7 @@ class GoalCommentSerializer(serializers.ModelSerializer):
     """
     user = UserProfileSerializer(read_only=True)
 
+    # Код ниже можно использовать для вывода информации на бэкэнде по названию Цели, к которой существует комментарий.
     # goal = serializers.SerializerMethodField()
     #
     # def get_goal(self, goalcomment):
@@ -183,6 +198,8 @@ class GoalSerializer(serializers.ModelSerializer):
     умолчанию. Проверка по дате дедлайна не позволяет указывать дату в прошлом в качестве дедлайна для цели.
     """
     user = UserProfileSerializer(read_only=True)
+
+    # Код ниже можно использовать для отображения текстов комментариев к Цели на бэкэнде.
     # goalcomment = serializers.SerializerMethodField()
     #
     # def get_goalcomment(self, goal):

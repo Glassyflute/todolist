@@ -6,6 +6,12 @@ from goals.models import Goal, GoalCategory
 
 
 class TgUser(models.Model):
+    """
+    Модель TgUser консолидирует информацию по пользователю из БД и пользователю в Телеграм, идентификатору чата с
+    пользователем Телеграм, сохраняет код верификации для связывания пользователя из БД с его Телеграм аккаунтом.
+    Методы модели включают обеспечение работы с кодом верификации и выгрузку информации из БД по целям и категориям
+    пользователя.
+    """
     tg_chat_id = models.BigIntegerField(verbose_name="Чат Телеграм", unique=True)
     user = models.ForeignKey(User, verbose_name="Пользователь", on_delete=models.CASCADE,
                              null=True, blank=True, default=None)

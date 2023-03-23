@@ -65,6 +65,9 @@ class LoginSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор на отображение информации по профилю пользователя.
+    """
     class Meta:
         model = User
         fields = ["id", "username", "first_name", "last_name", "email"]

@@ -6,6 +6,10 @@ from core.models import User
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
+    """
+    Админка для пользователя позволяет поиск по username пользователя, емейлу, имени и фамилии. Есть возможность
+    фильтровать данные по параметрам 'is_staff', 'is_active', 'is_superuser'.
+    """
     list_display = ('username', 'email', 'first_name', 'last_name')
     search_fields = ('username', 'email', 'first_name', 'last_name')
     list_filter = ('is_staff', 'is_active', 'is_superuser')
