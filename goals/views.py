@@ -228,7 +228,7 @@ class BoardView(RetrieveUpdateDestroyAPIView):
         return instance
 
 
-# для проверки в текущей домашке
+# для проверки на бэкэнде: вывод списка пар для модели BoardParticipant
 class BoardParticipantListView(ListAPIView):
     model = BoardParticipant
     permission_classes = [permissions.IsAuthenticated, BoardPermissions]

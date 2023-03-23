@@ -6,6 +6,10 @@ from core.models import User
 
 
 class TgUserSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор выводит информацию по модели TgUser и сверяет код верификации, присвоенный пользователю в модели
+    TgUser, с введенным пользователем кодом в приложении.
+    """
     tg_id = serializers.SlugField(source="tg_chat_id", read_only=True)
     username = serializers.SlugField(source="tg_username", read_only=True)
     user = serializers.PrimaryKeyRelatedField(read_only=True)

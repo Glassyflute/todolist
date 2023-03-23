@@ -9,6 +9,10 @@ from bot.tg.client import TgClient
 
 
 class BotVerificationView(GenericAPIView):
+    """
+    Позволяет подтвердить пользователя на основе кода верификации из сериализатора, отправляет сообщение в чате
+    Телеграм об успешном подтверждении и связывании аккаунта пользователя Телеграм и пользователя из БД.
+    """
     model = TgUser
     serializer_class = TgUserSerializer
     permission_classes = [permissions.IsAuthenticated]

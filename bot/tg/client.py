@@ -9,6 +9,10 @@ logger = logging.getLogger(__name__)
 
 
 class TgClient:
+    """
+    Хранит информацию по токену для Телеграм бота, использует long polling подход для обработки сообщений пользователя
+    в чате, отправляет ответные сообщения в чате пользователю.
+    """
     def __init__(self, token: str | None = None):
         self.token = token if token else settings.BOT_TELEGRAM_TOKEN
         # импортируем телеграм токен из django.conf settings

@@ -20,6 +20,6 @@ urlpatterns = [
     path("board/list", views.BoardListView.as_view(), name="board-list"),
     path("board/<int:pk>", views.BoardView.as_view(), name="board-detail"),
 
-    # для проверки пар доска-юзер в бэкэнде
+    # для проверки пар доска-юзер на бэкэнде
     path("board_participant/list", views.BoardParticipantListView.as_view(), name="boardparticipant-list"),
 ]
