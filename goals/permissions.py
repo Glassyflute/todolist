@@ -40,6 +40,10 @@ class GoalPermissions(permissions.IsAuthenticated):
     Менять/удалять цель имеет право создатель доски или редактор.
     """
     def has_object_permission(self, request, view, obj: Goal):
+        if obj.category is None:
+            category = GoalCategory.objects.create(title="Default", user=request.user)
+            obj.category = category
+
         _filters: dict = {"user_id": request.user.id, "board_id": obj.category.board_id}
 
         if request.method not in permissions.SAFE_METHODS:

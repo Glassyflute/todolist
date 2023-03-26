@@ -59,7 +59,7 @@ class GoalCategoryView(RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return GoalCategory.objects.filter(board__participants__user=self.request.user, is_deleted=False)
 
-    def perform_destroy(self, instance):
+    def perform_destroy(self, instance: GoalCategory):
         with transaction.atomic():
             instance.is_deleted = True
             instance.save()
@@ -117,7 +117,7 @@ class GoalView(RetrieveUpdateDestroyAPIView):
         return Goal.objects.filter(category__board__participants__user=self.request.user,
                                    category__is_deleted=False).exclude(status=Goal.Status.archived)
 
-    def perform_destroy(self, instance):
+    def perform_destroy(self, instance: Goal):
         with transaction.atomic():
             instance.is_deleted = True
             instance.status = Goal.Status.archived

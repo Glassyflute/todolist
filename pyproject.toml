@@ -23,6 +23,9 @@ coreapi = "^2.3.3"
 
 [tool.poetry.group.dev.dependencies]
 ansible-vault-win = "^1.0.0"
+mypy = "^1.1.1"
+django-stubs = "^1.16.0"
+djangorestframework-stubs = "^1.10.0"
 
 [build-system]
 requires = ["poetry-core"]
