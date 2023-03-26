@@ -1,6 +1,9 @@
+from typing import Any
+
 from django.contrib.auth import login, logout, update_session_auth_hash
 from rest_framework.generics import CreateAPIView, UpdateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from core.models import User
@@ -20,7 +23,7 @@ class LoginView(CreateAPIView):
     """
     serializer_class = LoginSerializer
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         login(request=request, user=serializer.save())
@@ -37,7 +40,7 @@ class UserProfileView(RetrieveUpdateDestroyAPIView):
     def get_object(self):
         return self.request.user
 
-    def perform_destroy(self, instance):
+    def perform_destroy(self, instance: User):
         logout(self.request)
 
 

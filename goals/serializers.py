@@ -1,6 +1,8 @@
 from datetime import *
+from typing import Optional
+
 from django.db import transaction
-from django.utils import timezone
+from django.utils import timezone   # type: ignore
 from rest_framework import serializers
 
 from core.models import User
@@ -118,9 +120,13 @@ class GoalCommentCreateSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "created", "updated", "user")
         fields = "__all__"
 
-    def validate_goal(self, value):
+    def validate_goal(self, value: Goal) -> Goal:
         if value.is_deleted:
             raise serializers.ValidationError("User is prohibited to comment on deleted goals.")
+
+        if value.category is None:
+            category = GoalCategory.objects.create(title="Default", user=self.context["request"].user)
+            value.category = category
 
         if not BoardParticipant.objects.filter(
             user_id=self.context["request"].user.id,
@@ -168,7 +174,7 @@ class GoalCreateSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "created", "updated", "is_deleted", "user")
         fields = "__all__"
 
-    def validate_category(self, value):
+    def validate_category(self, value: Optional[GoalCategory]) -> GoalCategory:
         if value is not None:
             if value.is_deleted:
                 raise serializers.ValidationError("User is prohibited to assign deleted categories for goals.")
@@ -178,7 +184,10 @@ class GoalCreateSerializer(serializers.ModelSerializer):
             if value.user != self.context["request"].user:
                 raise serializers.ValidationError("User is not owner of this category.")
         else:
-            value = GoalCategory.objects.create(title="Default", user=self.context["request"].user)
+            board = Board.objects.create(title="Default board")
+            boardparticipant = BoardParticipant.objects.create(board=board, user=self.context["request"].user,
+                                                               role=BoardParticipant.Role.owner)
+            value = GoalCategory.objects.create(title="Default", user=self.context["request"].user, board=board)
 
         return value
 
@@ -210,7 +219,7 @@ class GoalSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "created", "updated", "is_deleted")
         fields = "__all__"
 
-    def validate_category(self, value):
+    def validate_category(self, value: Optional[GoalCategory]) -> GoalCategory:
         if value is not None:
             if value.is_deleted:
                 raise serializers.ValidationError("User is prohibited to assign deleted categories for goals.")
@@ -220,7 +229,10 @@ class GoalSerializer(serializers.ModelSerializer):
             if value.user != self.context["request"].user:
                 raise serializers.ValidationError("User is not owner of this category.")
         else:
-            value = GoalCategory.objects.create(title="Default", user=self.context["request"].user)
+            board = Board.objects.create(title="Default board")
+            boardparticipant = BoardParticipant.objects.create(board=board, user=self.context["request"].user,
+                                                               role=BoardParticipant.Role.owner)
+            value = GoalCategory.objects.create(title="Default", user=self.context["request"].user, board=board)
 
         return value
 

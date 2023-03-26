@@ -26,17 +26,17 @@ class UserSignUpSerializer(serializers.ModelSerializer):
         model = User
         fields = ["id", "username", "email", "first_name", "last_name", "password", "password_repeat"]
 
-    def validate(self, user_data):
+    def validate(self, user_data: dict) -> dict:
         if user_data["password"] != user_data["password_repeat"]:
             raise serializers.ValidationError("Passwords must be identical to sign up.")
         return user_data
 
-    def validate_password(self, password):
+    def validate_password(self, password: str) -> str:
         user = self.context['request'].user
         validate_password(password, user=user)
         return password
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict) -> User:
         del validated_data["password_repeat"]
         validated_data["password"] = make_password(validated_data["password"])
         return super().create(validated_data)
@@ -89,17 +89,17 @@ class PasswordUpdateSerializer(serializers.Serializer):
             raise serializers.ValidationError("Incorrect old password.")
         return old_password
 
-    def validate(self, validated_data):
+    def validate(self, validated_data: dict) -> dict:
         if validated_data["old_password"] == validated_data["new_password"]:
             raise serializers.ValidationError("New password must differ from your old password.")
         return validated_data
 
-    def validate_new_password(self, new_password):
+    def validate_new_password(self, new_password: str) -> str:
         user = self.context['request'].user
         validate_password(new_password, user=user)
         return new_password
 
-    def update(self, instance, validated_data):
+    def update(self, instance: User, validated_data: dict) -> User:
         instance.set_password(validated_data["new_password"])
         instance.save(update_fields=["password"])
         return instance
