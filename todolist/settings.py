@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'core',
     'goals',
     'bot',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -116,10 +117,15 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'core.User'
 
-# REST_FRAMEWORK = {
-#     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
-# }
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
 
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Todolist API",
+    "DESCRIPTION": "Todolist API helps users manage and plan goals",
+    "VERSION": "1.0.0"
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
